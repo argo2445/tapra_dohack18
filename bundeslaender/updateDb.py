@@ -5,7 +5,9 @@ import csv
 
 # Dieses Script ordnet jeder Tankstelle das entsprechende Bundesland zu.
 # Die Bundesländer wurdem dem Städteverzeichnis unter https://gist.github.com/embayer/772c442419999fa52ca1
-# entnommen  
+# entnommen
+# Postleitzahlen von: https://www.suche-postleitzahl.org/downloads#
+
 
 def get_state_by_name(cityName):
   
