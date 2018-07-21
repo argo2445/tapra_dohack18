@@ -16,5 +16,7 @@ while(True):
   row=reader.fetchone()
   if row==None:
     break
+  # Check for invalid values
+  row[2:] = [val if val>0 else None for val in row[2:]]
   writer.execute('INSERT INTO gas_station_min_history (stid, e5, e10, diesel, date) VALUES (%s, %s, %s, %s, %s);',(row[1], row[2], row[3], row[4], row[0]))
   conn.commit()
