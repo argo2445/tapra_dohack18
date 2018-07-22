@@ -1,0 +1,72 @@
+# To store data
+import pandas as pd
+
+# To connect to postgresql
+import psycopg2
+
+# To walk online
+import requests
+
+# To get the date
+import datetime
+
+# To get seconds
+import time
+
+# To parse json
+import json
+
+
+# Setup
+gas_dict = {'super':'e5', 'diesel':'diesel', 'E zehn':'e10'}
+weekday_dict = {0:'montag', 1:'dienstag', 2:'mittwoch', 3:'donnerstag', 4:'freitag', 5:'samstag', 6:'sonntag'}
+date = str(datetime.date.today() - datetime.timedelta(days=21))
+
+
+# Connection
+def conn():
+    conn = psycopg2.connect("user='postgres' host='192.168.0.2' password='geheim' dbname=tankerkoenig16")
+    return conn.cursor()
+
+
+# Poll
+def dbAndSend():
+    cur = conn()
+    cur.execute("""select {}, date, brand, street, house_number
+                   from gas_station 
+                   full outer join gas_station_min_history on gas_station.id=gas_station_min_history.stid 
+                   where date>'{} 00:00:00' and place='{}'""".format(gas_dict[gas], date, town))
+    data = cur.fetchall()
+
+    df = pd.DataFrame(data, columns=['gas', 'date', 'brand', 'street', 'house_number']).set_index('date')
+    day, street, number, price, brand = df.groupby([df.index.weekday, 'street', 'house_number']).agg({'gas':'mean', 'brand':'max'}).sort_values(by='gas').head().head(1).reset_index().values[0]
+    text = 'Ich rate dir am Besten am {} zur {} Tankstelle bei der Adresse {} {} zu fahren.'.format(weekday_dict[day], brand, street, number)
+
+    r = requests.post('https://flauschiger.de/sqlresponse.php', data=text)
+    print(text)
+    
+    
+    
+url = 'https://flauschiger.de/echo.log'
+
+requestId = ''
+while True:
+    try:
+        time.sleep(0.5)
+    
+        ans = requests.get(url)
+        if ans.status_code==200:
+            json_data = ans.json()
+            
+            if requestId!=json_data['request']['requestId']:
+                requestId = json_data['request']['requestId']
+            
+                gas = json_data['request']['intent']['slots']['GAS']['value']
+                town = json_data['request']['intent']['slots']['STADT']['value'].capitalize()
+            
+                dbAndSend()
+    except:
+        pass
+        
+        
+        
