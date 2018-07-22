@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import psycopg2
 
+# Saves the average of every day's gas prizes 
+# in the Database to speed up the calculation
+
 # SELECT date_trunc('day', date) AS "Day" ,stid,  AVG(e5), AVG(e10), AVG(diesel)
 # FROM gas_station_information_history
 # GROUP BY 1, stid
