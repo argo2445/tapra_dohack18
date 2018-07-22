@@ -22,11 +22,11 @@ $ctr=0;
 while (!file_exists('resp.txt') || filemtime('echo.log')>filemtime('resp.txt')){
   sleep(1);
   $ctr++;
-  if($ctr>=6){
+  if($ctr>=8){
     break;
   }
 }
-if($ctr<6){
+if($ctr<8){
   $response=file_get_contents('resp.txt');
 
   $responseArray = [
