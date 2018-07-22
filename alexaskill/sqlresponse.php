@@ -3,13 +3,13 @@
 $entityBody = file_get_contents ( 'php://input' );
  
 // Datei namens echo.log öffen 
-$datei_handle = fopen ( "resp.txt", "a+" );
+$datei_handle = fopen ( "resp.txt", "w" );
  
 // etwas validierung      
 if (is_string($entityBody )) {
 // Request schoen formatieren
    fputs ( $datei_handle, $entityBody );
-}
+   }
 // alles speichern und beenden      
 fclose ( $datei_handle );
 echo $entityBody;
